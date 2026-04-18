@@ -64,10 +64,6 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 
 En tu repo de GitHub crea:
 
-### Secret
-
-- `GCP_CREDENTIALS`: JSON de una service account con permisos para `Cloud Build`, `Artifact Registry`, `Cloud Run Admin` y `Service Account User`.
-
 ### Repository Variables
 
 - `GCP_PROJECT_ID`: tu project id.
@@ -76,17 +72,69 @@ En tu repo de GitHub crea:
 - `IMAGE_NAME`: `job-datos-fintrust`
 - `JOB_NAME`: `job-datos-fintrust`
 - `CLOUD_RUN_SERVICE_ACCOUNT`: `cloud-run-jobs@PROJECT_ID.iam.gserviceaccount.com`
+- `GITHUB_ACTIONS_SERVICE_ACCOUNT`: service account que usará GitHub Actions para desplegar.
+- `GCP_WORKLOAD_IDENTITY_PROVIDER`: resource name completo del provider de Workload Identity Federation.
 - `SECRET_PROJECT_ID`: project id o project number donde vive el secreto.
 - `SECRET_ID`: nombre del secreto que consume el job.
 
 ## Permisos recomendados para la service account de GitHub Actions
 
-La cuenta del JSON de `GCP_CREDENTIALS` debe tener como mínimo:
+La service account que impersona GitHub Actions debe tener como mínimo:
 
 - `roles/run.admin`
 - `roles/cloudbuild.builds.editor`
 - `roles/artifactregistry.writer`
 - `roles/iam.serviceAccountUser`
+
+## Configuración recomendada de Workload Identity Federation
+
+Si tu organización bloquea la creación de claves JSON, esta es la ruta correcta. Reemplaza `PROJECT_ID`, `PROJECT_NUMBER`, `GITHUB_ORG`, `GITHUB_REPO` y los nombres si quieres usar otros:
+
+```bash
+gcloud config set project PROJECT_ID
+
+gcloud iam workload-identity-pools create github-pool \
+  --location=global \
+  --display-name="GitHub Actions Pool"
+
+gcloud iam workload-identity-pools providers create-oidc github-provider \
+  --location=global \
+  --workload-identity-pool=github-pool \
+  --display-name="GitHub Actions Provider" \
+  --issuer-uri="https://token.actions.githubusercontent.com" \
+  --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository,attribute.repository_owner=assertion.repository_owner,attribute.ref=assertion.ref"
+
+gcloud iam service-accounts create github-actions-deployer \
+  --display-name="GitHub Actions Deployer"
+
+gcloud projects add-iam-policy-binding PROJECT_ID \
+  --member="serviceAccount:github-actions-deployer@PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/run.admin"
+
+gcloud projects add-iam-policy-binding PROJECT_ID \
+  --member="serviceAccount:github-actions-deployer@PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/cloudbuild.builds.editor"
+
+gcloud projects add-iam-policy-binding PROJECT_ID \
+  --member="serviceAccount:github-actions-deployer@PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/artifactregistry.writer"
+
+gcloud projects add-iam-policy-binding PROJECT_ID \
+  --member="serviceAccount:github-actions-deployer@PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/iam.serviceAccountUser"
+
+gcloud iam service-accounts add-iam-policy-binding \
+  github-actions-deployer@PROJECT_ID.iam.gserviceaccount.com \
+  --role="roles/iam.workloadIdentityUser" \
+  --member="principalSet://iam.googleapis.com/projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/github-pool/attribute.repository/GITHUB_ORG/GITHUB_REPO"
+```
+
+Después, en GitHub `Settings > Secrets and variables > Actions > Variables`, crea:
+
+- `GCP_WORKLOAD_IDENTITY_PROVIDER`:
+  `projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/github-pool/providers/github-provider`
+- `GITHUB_ACTIONS_SERVICE_ACCOUNT`:
+  `github-actions-deployer@PROJECT_ID.iam.gserviceaccount.com`
 
 ## Cómo disparar el despliegue
 

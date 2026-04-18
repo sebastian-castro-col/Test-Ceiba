@@ -28,7 +28,8 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GITHUB_ACTIONS_SERVICE_ACCOUNT }}
 
       - name: Set up gcloud
         uses: google-github-actions/setup-gcloud@v2
@@ -48,4 +49,3 @@ jobs:
             --region "${GCP_REGION}" \
             --service-account "${{ vars.CLOUD_RUN_SERVICE_ACCOUNT }}" \
             --set-env-vars "APP_PROJECT_ID=${{ vars.GCP_PROJECT_ID }},SECRET_PROJECT_ID=${{ vars.SECRET_PROJECT_ID }},SECRET_ID=${{ vars.SECRET_ID }}"
-
