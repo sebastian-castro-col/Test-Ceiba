@@ -8,7 +8,10 @@ def main():
     print("=" * 60)
 
     credentials = get_credentials()
-    print(f"Secret loaded successfully with keys: {', '.join(sorted(credentials.keys()))}")
+    if isinstance(credentials, dict):
+        print(f"Secret loaded successfully with keys: {', '.join(sorted(credentials.keys()))}")
+    else:
+        print("Secret loaded successfully as plain text.")
 
     generate_transform_clients()
 
