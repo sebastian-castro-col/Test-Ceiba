@@ -1,5 +1,8 @@
 from config import get_credentials
-from transformations.customers import generate_transform_clients
+from transformations.customers import generate_transform_customers
+from transformations.loans import generate_transform_loans
+from transformations.installments import generate_transform_installments
+from transformations.payments import generate_transform_payments
 
 
 def main():
@@ -13,7 +16,14 @@ def main():
     else:
         print("Secret loaded successfully as plain text.")
 
-    generate_transform_clients()
+    print("=" * 60)
+    print("PROCESO DE LIMPIEZA Y TRANSFORMACION INICIADO CORRECTAMENTE")
+    print("=" * 60)
+
+    generate_transform_customers()
+    generate_transform_loans()
+    generate_transform_installments()
+    generate_transform_payments()
 
     print("=" * 60)
     print("PROCESO FINALIZADO CORRECTAMENTE")
