@@ -1,0 +1,11 @@
+pandas
+psycopg2-binary
+google-cloud-bigquery
+google-cloud-secret-manager
+google-auth
+google-auth-oauthlib
+db-dtypes
+pytz
+pandas_gbq
+numpy
+requests
