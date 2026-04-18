@@ -9,6 +9,7 @@ def generate_transform_loans():
     query = """
 
     CREATE OR REPLACE TABLE test-ceiba-col.raw_fintrust.stg_loans AS
+
     WITH valid_customers AS (
         SELECT customer_id FROM test-ceiba-col.raw_fintrust.stg_customers WHERE is_valid = TRUE
     )
@@ -22,7 +23,7 @@ def generate_transform_loans():
         l.term_months,
         UPPER(TRIM(l.loan_status)) AS loan_status,
         TRIM(l.product_type) AS product_type,
-        DATE_TRUNC('month', l.origination_date) AS cohort_month,
+        DATE_TRUNC(l.origination_date, MONTH) AS cohort_month,
         -- Indicadores de calidad
         CASE
             WHEN l.loan_id IS NULL THEN FALSE
