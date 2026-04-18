@@ -1,44 +1,40 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Apr 17 19:30:09 2026
-
-@author: sebastiancastro
-"""
-
 steps:
-# Build image
-- name: 'gcr.io/cloud-builders/docker'
+- name: gcr.io/cloud-builders/docker
   args:
-    [
-      'build',
-      '-t',
-      'us-central1-docker.pkg.dev/$PROJECT_ID/test-ceiba/test-ceiba',
-      '.'
-    ]
+    - build
+    - -t
+    - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}
+    - jobs/job_datos_fintrust
 
-# Push image
-- name: 'gcr.io/cloud-builders/docker'
+- name: gcr.io/cloud-builders/docker
   args:
-    [
-      'push',
-      'us-central1-docker.pkg.dev/$PROJECT_ID/test-ceiba/test-ceiba'
-    ]
+    - push
+    - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}
 
-# Deploy Cloud Run Job
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
   entrypoint: gcloud
   args:
-    [
-      'run',
-      'jobs',
-      'deploy',
-      'test-ceiba-job',
-      '--image',
-      'us-central1-docker.pkg.dev/$PROJECT_ID/test-ceiba/test-ceiba',
-      '--region',
-      'us-central1'
-    ]
+    - run
+    - jobs
+    - deploy
+    - ${_JOB_NAME}
+    - --image
+    - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}
+    - --region
+    - ${_REGION}
+    - --service-account
+    - ${_SERVICE_ACCOUNT}
+    - --set-env-vars
+    - APP_PROJECT_ID=$PROJECT_ID,SECRET_PROJECT_ID=${_SECRET_PROJECT_ID},SECRET_ID=${_SECRET_ID}
 
 images:
-- us-central1-docker.pkg.dev/$PROJECT_ID/test-ceiba/test-ceiba
+- ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}
+
+substitutions:
+  _REGION: us-central1
+  _REPOSITORY: test-ceiba
+  _IMAGE: job-datos-fintrust
+  _JOB_NAME: job-datos-fintrust
+  _SERVICE_ACCOUNT: cloud-run-jobs@$PROJECT_ID.iam.gserviceaccount.com
+  _SECRET_PROJECT_ID: ""
+  _SECRET_ID: ""

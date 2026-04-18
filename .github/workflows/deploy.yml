@@ -1,0 +1,51 @@
+name: Deploy job_datos_fintrust
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  GCP_REGION: ${{ vars.GCP_REGION || 'us-central1' }}
+  ARTIFACT_REGISTRY_REPOSITORY: ${{ vars.ARTIFACT_REGISTRY_REPOSITORY || 'test-ceiba' }}
+  IMAGE_NAME: ${{ vars.IMAGE_NAME || 'job-datos-fintrust' }}
+  JOB_NAME: ${{ vars.JOB_NAME || 'job-datos-fintrust' }}
+  JOB_SOURCE_DIR: jobs/job_datos_fintrust
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure project
+        run: gcloud config set project "${{ vars.GCP_PROJECT_ID }}"
+
+      - name: Build container image
+        run: |
+          gcloud builds submit "${JOB_SOURCE_DIR}" \
+            --tag "${GCP_REGION}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${ARTIFACT_REGISTRY_REPOSITORY}/${IMAGE_NAME}"
+
+      - name: Deploy Cloud Run job
+        run: |
+          gcloud run jobs deploy "${JOB_NAME}" \
+            --image "${GCP_REGION}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${ARTIFACT_REGISTRY_REPOSITORY}/${IMAGE_NAME}" \
+            --region "${GCP_REGION}" \
+            --service-account "${{ vars.CLOUD_RUN_SERVICE_ACCOUNT }}" \
+            --set-env-vars "APP_PROJECT_ID=${{ vars.GCP_PROJECT_ID }},SECRET_PROJECT_ID=${{ vars.SECRET_PROJECT_ID }},SECRET_ID=${{ vars.SECRET_ID }}"
+
