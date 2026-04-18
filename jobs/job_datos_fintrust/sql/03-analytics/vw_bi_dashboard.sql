@@ -2,6 +2,7 @@
 
 -- VW 1: Originación diaria (para gráfica de barras por día/ciudad/segmento)
 
+
 CREATE OR REPLACE VIEW test-ceiba-col.analytics.vw_originacion_diaria AS
 SELECT
     l.origination_date,
@@ -53,7 +54,7 @@ WITH pagos_enriquecidos AS (
 )
 SELECT
     payment_date,
-    strftime(payment_date, '%Y-%m')                     AS mes_pago,
+    FORMAT_DATE('%Y-%m', payment_date) AS mes_pago,                   
     city,
     segment,
     payment_channel,
@@ -66,7 +67,7 @@ SELECT
         / NULLIF(SUM(payment_amount), 0), 2
     )                                                   AS pct_recaudo_mora
 FROM pagos_enriquecidos
-GROUP BY payment_date, strftime(payment_date, '%Y-%m'), city, segment, payment_channel;
+GROUP BY payment_date, FORMAT_DATE('%Y-%m', payment_date), city, segment, payment_channel;
 
 -- ----------------------------------------------------------------------------
 -- VW 3: Estado de cartera por cohorte (mora vs vigente)
@@ -74,7 +75,7 @@ GROUP BY payment_date, strftime(payment_date, '%Y-%m'), city, segment, payment_c
 CREATE OR REPLACE VIEW test-ceiba-col.analytics.vw_cartera_cohorte AS
 SELECT
     cohort_month,
-    strftime(cohort_month, '%Y-%m')                     AS cohort_label,
+    FORMAT_DATE('%Y-%m', cohort_month) AS cohort_label, 
     city,
     segment,
     product_type,
@@ -89,7 +90,7 @@ SELECT
              THEN balance_due ELSE 0 END)               AS saldo_vigente,
     MAX(days_overdue)                                   AS max_dias_mora
 FROM test-ceiba-col.analytics.dm_cartera
-GROUP BY cohort_month, strftime(cohort_month, '%Y-%m'),
+GROUP BY cohort_month,FORMAT_DATE('%Y-%m', cohort_month),
          city, segment, product_type, mora_bucket;
 
 -- ----------------------------------------------------------------------------
@@ -123,9 +124,9 @@ SELECT
     -- Dimensiones de tiempo
     dc.origination_date,
     dc.cohort_month,
-    strftime(dc.cohort_month, '%Y-%m')                  AS cohort_label,
+    FORMAT_DATE('%Y-%m', dc.cohort_month) AS cohort_label, 
     dc.due_date,
-    strftime(dc.due_date, '%Y-%m')                      AS mes_vencimiento,
+    FORMAT_DATE('%Y-%m', dc.due_date) AS mes_vencimiento,
     dc.last_payment_date,
     dc.analysis_date,
     -- Dimensiones geográficas y demográficas
