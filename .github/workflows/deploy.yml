@@ -34,13 +34,21 @@ jobs:
       - name: Set up gcloud
         uses: google-github-actions/setup-gcloud@v2
 
+      - name: Authenticate Docker to Artifact Registry
+        run: gcloud auth configure-docker "${GCP_REGION}-docker.pkg.dev" --quiet
+
       - name: Configure project
         run: gcloud config set project "${{ vars.GCP_PROJECT_ID }}"
 
       - name: Build container image
         run: |
-          gcloud builds submit "${JOB_SOURCE_DIR}" \
-            --tag "${GCP_REGION}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${ARTIFACT_REGISTRY_REPOSITORY}/${IMAGE_NAME}"
+          docker build \
+            -t "${GCP_REGION}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${ARTIFACT_REGISTRY_REPOSITORY}/${IMAGE_NAME}" \
+            "${JOB_SOURCE_DIR}"
+
+      - name: Push container image
+        run: |
+          docker push "${GCP_REGION}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${ARTIFACT_REGISTRY_REPOSITORY}/${IMAGE_NAME}"
 
       - name: Deploy Cloud Run job
         run: |
