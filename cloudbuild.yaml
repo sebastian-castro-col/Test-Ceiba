@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Apr 17 19:30:09 2026
+
+@author: sebastiancastro
+"""
+
+steps:
+# Build image
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    [
+      'build',
+      '-t',
+      'us-central1-docker.pkg.dev/$PROJECT_ID/test-ceiba/test-ceiba',
+      '.'
+    ]
+
+# Push image
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    [
+      'push',
+      'us-central1-docker.pkg.dev/$PROJECT_ID/test-ceiba/test-ceiba'
+    ]
+
+# Deploy Cloud Run Job
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args:
+    [
+      'run',
+      'jobs',
+      'deploy',
+      'test-ceiba-job',
+      '--image',
+      'us-central1-docker.pkg.dev/$PROJECT_ID/test-ceiba/test-ceiba',
+      '--region',
+      'us-central1'
+    ]
+
+images:
+- us-central1-docker.pkg.dev/$PROJECT_ID/test-ceiba/test-ceiba
