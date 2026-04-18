@@ -72,7 +72,7 @@ En tu repo de GitHub crea:
 - `IMAGE_NAME`: `job-datos-fintrust`
 - `JOB_NAME`: `job-datos-fintrust`
 - `CLOUD_RUN_SERVICE_ACCOUNT`: `cloud-run-jobs@PROJECT_ID.iam.gserviceaccount.com`
-- `GITHUB_ACTIONS_SERVICE_ACCOUNT`: service account que usará GitHub Actions para desplegar.
+- `GCP_DEPLOYER_SERVICE_ACCOUNT`: service account que usará GitHub Actions para desplegar.
 - `GCP_WORKLOAD_IDENTITY_PROVIDER`: resource name completo del provider de Workload Identity Federation.
 - `SECRET_PROJECT_ID`: project id o project number donde vive el secreto.
 - `SECRET_ID`: nombre del secreto que consume el job.
@@ -133,7 +133,7 @@ Después, en GitHub `Settings > Secrets and variables > Actions > Variables`, cr
 
 - `GCP_WORKLOAD_IDENTITY_PROVIDER`:
   `projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/github-pool/providers/github-provider`
-- `GITHUB_ACTIONS_SERVICE_ACCOUNT`:
+- `GCP_DEPLOYER_SERVICE_ACCOUNT`:
   `github-actions-deployer@PROJECT_ID.iam.gserviceaccount.com`
 
 ## Cómo disparar el despliegue
