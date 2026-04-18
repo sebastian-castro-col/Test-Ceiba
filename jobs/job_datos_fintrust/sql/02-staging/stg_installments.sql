@@ -5,9 +5,10 @@
 --   3. Validar montos principal_due e interest_due >= 0
 --   4. Validar installment_status en dominio conocido
 
-CREATE OR REPLACE TABLE staging.stg_installments AS
+CREATE OR REPLACE TABLE test-ceiba-col.raw_fintrust.stg_installments AS
+
 WITH valid_loans AS (
-    SELECT loan_id, term_months FROM staging.stg_loans WHERE is_valid = TRUE
+    SELECT loan_id, term_months FROM test-ceiba-col.raw_fintrust.stg_loans WHERE is_valid = TRUE
 )
 SELECT
     i.installment_id,
@@ -49,5 +50,5 @@ SELECT
         ELSE NULL
     END AS quality_issue,
     CURRENT_TIMESTAMP AS _stg_loaded_at
-FROM raw_fintrust.installments i
+FROM test-ceiba-col.raw_fintrust.installments i
 LEFT JOIN valid_loans vl ON i.loan_id = vl.loan_id;
