@@ -8,7 +8,7 @@ def generate_transform_customers():
     client = bigquery.Client(project=PROJECT_ID or None)
     query = """
 
-    CREATE OR REPLACE TABLE staging.stg_customers AS
+   CREATE OR REPLACE TABLE test-ceiba-col.raw_fintrust.stg_customers AS
     SELECT
         customer_id,
         TRIM(full_name) AS full_name,
@@ -34,7 +34,7 @@ def generate_transform_customers():
             ELSE NULL
         END AS quality_issue,
         CURRENT_TIMESTAMP AS _stg_loaded_at
-    FROM raw_fintrust.customers;
+    FROM test-ceiba-col.raw_fintrust.customers;
 
 """
     query_job = client.query(query)
