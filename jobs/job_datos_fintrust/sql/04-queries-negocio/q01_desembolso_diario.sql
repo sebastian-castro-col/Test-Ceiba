@@ -3,16 +3,42 @@
 -- La vista ya agrega por origination_date/city/segment/product_type
 -- Sumamos filas en caso de que haya más de un registro por combinación
 
+-- Desembolsos x Dia
+
 SELECT
-    origination_date                        AS fecha_desembolso,
-    city                                    AS ciudad,
-    segment                                 AS segmento,
-    product_type                            AS tipo_producto,
-    SUM(num_creditos)                       AS numero_creditos,
-    SUM(monto_desembolsado)                 AS monto_total_COP,
-    ROUND(SUM(monto_desembolsado) / NULLIF(SUM(num_creditos), 0), 0) AS ticket_promedio_COP,
-    ROUND(AVG(tasa_promedio) * 100, 2)      AS tasa_ea_promedio_pct,
-    ROUND(AVG(plazo_promedio), 1)           AS plazo_promedio_meses
+    origination_date AS fecha_desembolso,
+    SUM(monto_desembolsado) AS monto_total_COP
 FROM test-ceiba-col.analytics.vw_originacion_diaria
-GROUP BY origination_date, city, segment, product_type
+GROUP BY origination_date
+ORDER BY origination_date ASC;
+
+
+-- Desembolsos x Ciudad
+
+SELECT
+    city,
+    SUM(monto_desembolsado) AS monto_total_COP
+FROM test-ceiba-col.analytics.vw_originacion_diaria
+GROUP BY city
+ORDER BY 2 DESC;
+
+-- Desembolsos x Segmento
+
+SELECT
+    segment,
+    SUM(monto_desembolsado) AS monto_total_COP
+FROM test-ceiba-col.analytics.vw_originacion_diaria
+GROUP BY segment
+ORDER BY 2 DESC
+
+
+-- Desembolsos x Fecha,Ciudad,Segmento
+
+SELECT
+    origination_date AS fecha_desembolso,
+    city AS ciudad,
+    segment AS segmento,
+    SUM(monto_desembolsado) AS monto_total_COP
+FROM test-ceiba-col.analytics.vw_originacion_diaria
+GROUP BY origination_date, city, segment
 ORDER BY origination_date DESC, monto_total_COP DESC;
