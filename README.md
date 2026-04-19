@@ -71,7 +71,7 @@ En tu repo de GitHub crea:
 - `ARTIFACT_REGISTRY_REPOSITORY`: `test-ceiba`
 - `IMAGE_NAME`: `job-datos-fintrust`
 - `JOB_NAME`: `job-datos-fintrust`
-- `CLOUD_RUN_SERVICE_ACCOUNT`: `cloud-run-jobs@PROJECT_ID.iam.gserviceaccount.com`
+- `CLOUD_RUN_SERVICE_ACCOUNT`
 - `GCP_DEPLOYER_SERVICE_ACCOUNT`: service account que usará GitHub Actions para desplegar.
 - `GCP_WORKLOAD_IDENTITY_PROVIDER`: resource name completo del provider de Workload Identity Federation.
 - `SECRET_PROJECT_ID`: project id o project number donde vive el secreto.
