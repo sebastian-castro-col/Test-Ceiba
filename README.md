@@ -71,7 +71,7 @@ En tu repo de GitHub crea:
 - `ARTIFACT_REGISTRY_REPOSITORY`: `test-ceiba`
 - `IMAGE_NAME`: `job-datos-fintrust`
 - `JOB_NAME`: `job-datos-fintrust`
-- `CLOUD_RUN_SERVICE_ACCOUNT`: `cloud-run-jobs@PROJECT_ID.iam.gserviceaccount.com`
+- `CLOUD_RUN_SERVICE_ACCOUNT`
 - `GCP_DEPLOYER_SERVICE_ACCOUNT`: service account que usará GitHub Actions para desplegar.
 - `GCP_WORKLOAD_IDENTITY_PROVIDER`: resource name completo del provider de Workload Identity Federation.
 - `SECRET_PROJECT_ID`: project id o project number donde vive el secreto.
@@ -149,7 +149,3 @@ También puedes desplegar sin GitHub Actions:
 gcloud builds submit --config cloudbuild.yaml \
   --substitutions=_REGION=us-central1,_REPOSITORY=test-ceiba,_IMAGE=job-datos-fintrust,_JOB_NAME=job-datos-fintrust,_SERVICE_ACCOUNT=cloud-run-jobs@PROJECT_ID.iam.gserviceaccount.com,_SECRET_PROJECT_ID=SECRET_PROJECT_ID,_SECRET_ID=SECRET_ID
 ```
-
-## Importante antes de correr en producción
-
-El query de `jobs/job_datos_fintrust/transformations/customers.py` sigue apuntando a `proyecto.dataset.tabla`. Debes reemplazarlo por la consulta real de Fintrust antes de ejecutar el job en producción.
