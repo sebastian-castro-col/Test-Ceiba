@@ -149,7 +149,3 @@ También puedes desplegar sin GitHub Actions:
 gcloud builds submit --config cloudbuild.yaml \
   --substitutions=_REGION=us-central1,_REPOSITORY=test-ceiba,_IMAGE=job-datos-fintrust,_JOB_NAME=job-datos-fintrust,_SERVICE_ACCOUNT=cloud-run-jobs@PROJECT_ID.iam.gserviceaccount.com,_SECRET_PROJECT_ID=SECRET_PROJECT_ID,_SECRET_ID=SECRET_ID
 ```
-
-## Importante antes de correr en producción
-
-El query de `jobs/job_datos_fintrust/transformations/customers.py` sigue apuntando a `proyecto.dataset.tabla`. Debes reemplazarlo por la consulta real de Fintrust antes de ejecutar el job en producción.
